@@ -68,33 +68,31 @@
 
                 this.width = width
                 this.height = height
-                this.depth = depth
-                
+                this.depth = depth   
                 this.position.set(position.x, position.y, position.z)
-
                 this.bottom = this.position.y-this.height/2
                 this.top = this.position.y + this.height/2
-
                 this.velocity = velocity
                 this.gravity = -0.005
             }
+
             update(group) {
                 this.bottom = this.position.y - this.height / 2
                 this.top = this.position.y + this.height/2 
-
-                this.velocity.y += this.gravity
-
+                this.position.x += this.velocity.x
+                this.position.z += this.velocity.z
                 this.applyGravity()
             }
 
             applyGravity(){
                 //hitting the ground
                 this.velocity.y += this.gravity
-                if (this.bottom + this.velocity.y<=ground.top){
-                    this.velocity.y *= 0.8
-                    this.velocity.y = -this.velocity.y
+                this.position.y += this.velocity.y
+                this.bottom = this.position.y - this.height / 2
+                if (this.bottom <=ground.top){
+                    this.position.y = ground.top + this.height / 2
+                    this.velocity.y *= -0.8
                 }
-                else this.position.y += this.velocity.y
             }
         }
 
@@ -134,9 +132,68 @@
 
         camera.position.z = 5
 
+        const keys = {
+            a: {
+                pressed:false
+            },
+             d: {
+                pressed: false
+             },
+             s: {
+                pressed: false
+             },
+             w: {
+                pressed: false
+             }
+        }
+        window.addEventListener('keydown', (event) => {
+            console.log(event)
+            switch(event.code){
+                case 'KeyD':
+                    console.log('we pressed down')
+                    keys.d.pressed = true
+                    break
+                case 'KeyA':
+                    keys.a.pressed = true
+                    break
+                case 'KeyS':
+                    keys.s.pressed = true
+                    break
+                case 'KeyW':
+                    keys.w.pressed = true
+                    break
+            }
+        })
+
+        window.addEventListener('keyup', (event) => {
+            switch(event.code) {
+                case 'KeyD':
+                    keys.d.pressed = false
+                    break
+                case 'KeyA':
+                    keys.a.pressed = false
+                    break
+                case 'KeyS':
+                    keys.s.pressed = false
+                    break;
+                case 'KeyW':
+                    keys.w.pressed = false
+                    break;
+            }
+        })
         function animate() {
             requestAnimationFrame(animate)
             renderer.render(scene, camera)
+
+            if(keys.a.pressed){
+                cube.velocity.x = -0.01
+
+            }else if(keys.d.pressed){
+                cube.velocity.x = 0.01
+            }
+            if (keys.s.pressed) cube.velocity.z = 0.01
+            else if (keys.w.pressed) cube.velocity.z = - 0.01
+
             cube.update(ground)
             // cube.rotation.x += 0.01
             // cube.rotation.y += 0.01
@@ -144,7 +201,5 @@
 
         animate()
     </script>
-
 </body>
-
 </html>
